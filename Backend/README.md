@@ -1,5 +1,49 @@
 # empify
 
+## Backend (Quarkus + PostgreSQL)
+
+Run the backend and database from the repository root:
+
+```powershell
+docker compose -f Backend\docker-compose.yml up --build
+```
+
+Compose initializes a new PostgreSQL volume using `Database/empifyDB.sql`, listens
+on port `5433` on the host, and keeps database data and development JWT keys in
+named Docker volumes. Schema initialization only runs when the database volume
+is first created. Do not remove that volume if you need to preserve its data.
+
+The local Compose defaults are for development only. Set `DB_USER` and
+`DB_PASSWORD` in `Backend/.env` before starting Compose to override them. The
+backend listens on `http://localhost:8080`; OpenAPI is available at
+`/q/openapi` and Swagger UI at `/q/swagger-ui`.
+
+The Compose container generates an RSA key pair in its persistent JWT volume on
+first start. For production, provide managed signing and verification keys and
+do not use development database credentials or development-generated keys.
+
+Authentication payloads use JSON fields `username`, `email`, `password` for
+registration and `email`, `password` for login. Login and registration return
+`accessToken`, `refreshToken`, and `user`. Refresh requires a JSON body containing
+`refreshToken`; logout uses the authenticated access token and revokes that
+user's refresh sessions. Access tokens expire after 15 minutes; refresh tokens
+are rotated and expire after 30 days.
+
+Track uploads accept multipart fields `file`, `title`, `artist`, and `album`.
+Uploads are limited to 100 MB. Track list queries return metadata only; media
+bytes remain in PostgreSQL and are fetched only by the stream and cover routes.
+Audio streaming supports single HTTP byte ranges for seeking.
+
+## Tests
+
+With JDK 21 installed, run the unit tests from `Backend`:
+
+```powershell
+.\mvnw.cmd test
+```
+
+The byte-range parser tests do not require a running database.
+
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
