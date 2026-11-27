@@ -19,8 +19,11 @@ backend listens on `http://localhost:8080`; OpenAPI is available at
 `/q/openapi` and Swagger UI at `/q/swagger-ui`.
 
 The Compose container generates an RSA key pair in its persistent JWT volume on
-first start. For production, provide managed signing and verification keys and
-do not use development database credentials or development-generated keys.
+first start. For local development without Docker, start Quarkus with
+`.\Backend\run-dev.ps1` from the repository root; the script generates a local RSA pair
+under `Backend/jwt/` and keeps it out of Git. For production, provide managed
+signing and verification keys and do not use development database credentials
+or development-generated keys.
 
 Authentication payloads use JSON fields `username`, `email`, `password` for
 registration and `email`, `password` for login. Login and registration return

@@ -24,8 +24,8 @@ services:
       QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://postgres:5432/empify_db
       QUARKUS_DATASOURCE_USERNAME: ${DB_USER:-empify}
       QUARKUS_DATASOURCE_PASSWORD: ${DB_PASSWORD:-empify_dev_password}
-      JWT_PRIVATE_KEY_LOCATION: /run/jwt/privateKey.pem
-      JWT_PUBLIC_KEY_LOCATION: /run/jwt/publicKey.pem
+      JWT_PRIVATE_KEY_LOCATION: file:/run/jwt/privateKey.pem
+      JWT_PUBLIC_KEY_LOCATION: file:/run/jwt/publicKey.pem
     volumes:
       - jwt_keys:/run/jwt
     ports:
