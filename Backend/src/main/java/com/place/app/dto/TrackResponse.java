@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.OffsetDateTime;
 
 public record TrackResponse(
-        Long id,
+        String id,
         String title,
         String artist,
         String album,

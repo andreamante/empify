@@ -4,10 +4,10 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 public record PlaylistResponse(
-        Long id,
+        String id,
         String name,
         String description,
         OffsetDateTime createdAt,
-        List<PlaylistTrackResponse> tracks
+        List<TrackResponse> tracks
 ) {
 }
