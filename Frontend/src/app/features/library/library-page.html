@@ -1,0 +1,161 @@
+<section class="library-page">
+  <header class="page-heading">
+    <div>
+      <h1>{{ title() }}</h1>
+      <p class="page-description">
+        {{ favoriteOnly() ? 'I brani che hai contrassegnato.' : 'La musica che hai scelto di tenere.' }}
+      </p>
+    </div>
+    <a class="button button-primary upload-link" routerLink="/upload">
+      <svg viewBox="0 0 20 20" aria-hidden="true">
+        <path d="M10 13V3m0 0L6 7m4-4 4 4M4 13v3h12v-3" />
+      </svg>
+      Carica brani
+    </a>
+  </header>
+
+  <section class="collection-strip" aria-label="Riepilogo raccolta">
+    <span class="collection-stat"><strong>{{ trackService.tracks().length }}</strong> brani</span>
+    <span class="collection-divider" aria-hidden="true">/</span>
+    <span class="collection-stat"><strong>{{ favoriteCount() }}</strong> preferiti</span>
+    <p class="demo-label"><span></span> Raccolta demo</p>
+  </section>
+
+  <div class="track-tools">
+    <label class="search-field">
+      <svg viewBox="0 0 20 20" aria-hidden="true">
+        <circle cx="8.7" cy="8.7" r="5.6" />
+        <path d="m13 13 4 4" />
+      </svg>
+      <span class="visually-hidden">Cerca nella raccolta</span>
+      <input type="search" placeholder="Cerca brano, artista o album" [value]="query()" (input)="setQuery($event)" />
+    </label>
+    <label class="playlist-select">
+      <span>Aggiungi a</span>
+      <select
+        aria-label="Scegli una playlist"
+        [value]="selectedPlaylistId()"
+        (change)="setPlaylist($event)"
+      >
+        @for (playlist of playlistService.playlists(); track playlist.id) {
+          <option [value]="playlist.id">{{ playlist.name }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (error()) {
+    <p class="inline-error" role="alert">{{ error() }}</p>
+  }
+
+  @if (visibleTracks().length) {
+    <div class="track-table-wrap">
+      <table class="track-table">
+        <thead>
+          <tr>
+            <th scope="col" class="track-number-heading">N.</th>
+            <th scope="col">Brano</th>
+            <th scope="col" class="album-column">Album</th>
+            <th scope="col" class="plays-column">Ascolti</th>
+            <th scope="col" class="duration-heading">Durata</th>
+            <th scope="col"><span class="visually-hidden">Azioni</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (track of visibleTracks(); track track.id; let index = $index) {
+            <tr [class.is-current]="audio.currentTrack()?.id === track.id">
+              <td class="track-number">
+                @if (audio.currentTrack()?.id === track.id && audio.isPlaying()) {
+                  <span class="playing-mark" aria-label="In riproduzione">
+                    <i></i><i></i><i></i>
+                  </span>
+                } @else {
+                  <span>{{ (index + 1).toString().padStart(2, '0') }}</span>
+                }
+              </td>
+              <td>
+                <div class="track-cell">
+                  <button
+                    class="cover-button"
+                    type="button"
+                    [attr.aria-label]="'Riproduci ' + track.title"
+                    (click)="play(track)"
+                  >
+                    <img [src]="track.coverUrl || '/mock-covers/small-hours.svg'" [alt]="''" />
+                    <span class="cover-play" aria-hidden="true">
+                      <svg viewBox="0 0 20 20"><path d="m7 4 9 6-9 6z" /></svg>
+                    </span>
+                  </button>
+                  <div class="track-copy">
+                    <button class="track-title" type="button" (click)="play(track)">{{ track.title }}</button>
+                    <span class="track-artist">{{ track.artist }}</span>
+                    @if (audio.currentTrack()?.id === track.id) {
+                      <div class="catalog-progress" aria-label="Progresso del brano">
+                        <span class="catalog-code">LATO {{ (index + 1).toString().padStart(2, '0') }}</span>
+                        <span class="catalog-rule">
+                          <span [style.width.%]="audio.progress()"></span>
+                        </span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </td>
+              <td class="album-column">{{ track.album }}</td>
+              <td class="plays-column">{{ track.playCount }}</td>
+              <td class="duration-cell">{{ formatDuration(track.durationSeconds) }}</td>
+              <td class="row-actions">
+                @if (pendingDeleteId() === track.id) {
+                  <div class="row-delete-confirm">
+                    <button class="confirm-delete" type="button" (click)="deleteTrack(track)">Elimina</button>
+                    <button class="cancel-delete" type="button" [attr.aria-label]="'Annulla rimozione di ' + track.title" (click)="cancelDelete()">Annulla</button>
+                  </div>
+                } @else {
+                  <button
+                    class="icon-button favorite-button"
+                    type="button"
+                    [class.is-favorite]="track.isFavorite"
+                    [attr.aria-label]="track.isFavorite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+                    [attr.aria-pressed]="track.isFavorite"
+                    (click)="toggleFavorite(track)"
+                  >
+                    <svg viewBox="0 0 20 20" aria-hidden="true">
+                      <path d="M10 17s-6.5-3.8-6.5-8.5a3.5 3.5 0 0 1 6.5-1.8A3.5 3.5 0 0 1 16.5 8.5C16.5 13.2 10 17 10 17Z" />
+                    </svg>
+                  </button>
+                  <button
+                    class="add-button"
+                    type="button"
+                    [disabled]="!selectedPlaylistId()"
+                    [attr.aria-label]="'Aggiungi ' + track.title + ' alla playlist selezionata'"
+                    (click)="addToPlaylist(track)"
+                  >+</button>
+                  <button
+                    class="icon-button delete-track-button"
+                    type="button"
+                    [attr.aria-label]="'Rimuovi ' + track.title + ' dalla raccolta'"
+                    (click)="requestDelete(track.id)"
+                  >
+                    <svg viewBox="0 0 20 20" aria-hidden="true">
+                      <path d="M4 6h12m-10 0 .7 10h6.6L14 6M8 6V4h4v2m-3 3v4m2-4v4" />
+                    </svg>
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <span class="empty-index">00</span>
+      <h2>      {{ query() ? 'Nessun brano trovato' : favoriteOnly() ? 'Nessun preferito, per ora' : 'La raccolta è vuota' }}</h2>
+      <p>
+        {{ query() ? 'Prova con un altro titolo, artista o album.' : favoriteOnly() ? 'Contrassegna un brano con il cuore per ritrovarlo qui.' : 'Carica un brano per iniziare la tua raccolta.' }}
+      </p>
+      @if (!query() && !favoriteOnly()) {
+        <a class="button button-primary" routerLink="/upload">Carica il primo brano</a>
+      }
+    </div>
+  }
+</section>

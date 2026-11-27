@@ -1,0 +1,60 @@
+<section class="upload-page">
+  <header class="page-heading">
+    <div>
+      <p class="page-context">LA TUA MUSICA</p>
+      <h1>Aggiungi un brano</h1>
+      <p class="page-description">Carica un file audio per ascoltarlo nella tua raccolta personale.</p>
+    </div>
+  </header>
+
+  <form class="upload-form" (ngSubmit)="submit()">
+    <label class="file-drop">
+      <input type="file" accept="audio/*" (change)="selectFile($event)" />
+      <span class="upload-symbol" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><path d="M16 21V5m0 0-6 6m6-6 6 6M6 20v7h20v-7" /></svg>
+      </span>
+      @if (file(); as selectedFile) {
+        <strong>{{ selectedFile.name }}</strong>
+        <span>{{ formatSize(selectedFile.size) }} · {{ selectedFile.type || 'Tipo audio' }}</span>
+        <span class="file-change">Scegli un altro file</span>
+      } @else {
+        <strong>Scegli un file audio</strong>
+        <span>Seleziona un file dal tuo dispositivo</span>
+        <span class="file-change">MP3, WAV, FLAC e altri formati supportati dal browser</span>
+      }
+    </label>
+
+    <div class="metadata-heading">
+      <h2>Dettagli del brano</h2>
+      <span>Necessari: titolo e artista</span>
+    </div>
+    <div class="metadata-grid">
+      <label>
+        <span>Titolo</span>
+        <input required maxlength="160" [ngModel]="title()" (ngModelChange)="title.set($event)" name="title" placeholder="Titolo del brano" />
+      </label>
+      <label>
+        <span>Artista</span>
+        <input required maxlength="120" [ngModel]="artist()" (ngModelChange)="artist.set($event)" name="artist" placeholder="Nome dell’artista" />
+      </label>
+      <label class="album-field">
+        <span>Album <small>facoltativo</small></span>
+        <input maxlength="160" [ngModel]="album()" (ngModelChange)="album.set($event)" name="album" placeholder="Nome dell’album" />
+      </label>
+    </div>
+
+    @if (error()) {
+      <p class="form-message form-error" role="alert">{{ error() }}</p>
+    }
+    @if (success()) {
+      <p class="form-message form-success" role="status">{{ success() }}</p>
+    }
+
+    <footer class="form-actions">
+      <a routerLink="/library">Torna alla raccolta</a>
+      <button class="button button-primary" type="submit" [disabled]="busy()">
+        {{ busy() ? 'Caricamento…' : 'Aggiungi alla raccolta' }}
+      </button>
+    </footer>
+  </form>
+</section>

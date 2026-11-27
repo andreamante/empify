@@ -1,0 +1,49 @@
+<section class="auth-page">
+  <div class="auth-art" aria-hidden="true">
+    <div class="record-label">EM<br />01</div>
+    <div class="record-groove"></div>
+    <span class="art-caption">LA TUA MUSICA,<br />AL SUO POSTO.</span>
+  </div>
+  <div class="auth-panel">
+    <a class="wordmark" routerLink="/library" aria-label="Empify, vai alla raccolta">
+      <span class="brand-mark">e</span>
+      <span>empify</span>
+    </a>
+    <p class="page-context">{{ isRegister() ? 'INIZIA LA TUA RACCOLTA' : 'BENTORNATO' }}</p>
+    <h1>{{ isRegister() ? 'Crea il tuo spazio.' : 'La tua musica ti aspetta.' }}</h1>
+    <p class="auth-description">
+      {{ isRegister() ? 'Un posto personale per i brani che scegli di tenere.' : 'Accedi per tornare alla tua raccolta personale.' }}
+    </p>
+
+    <form (ngSubmit)="submit()">
+      @if (isRegister()) {
+        <label>
+          <span>Nome</span>
+          <input required autocomplete="name" [ngModel]="username()" (ngModelChange)="username.set($event)" name="username" placeholder="Come ti chiami?" />
+        </label>
+      }
+      <label>
+        <span>Email</span>
+        <input required type="email" autocomplete="email" [ngModel]="email()" (ngModelChange)="email.set($event)" name="email" placeholder="nome@email.com" />
+      </label>
+      <label>
+        <span>Password</span>
+        <input required type="password" minlength="6" [autocomplete]="isRegister() ? 'new-password' : 'current-password'" [ngModel]="password()" (ngModelChange)="password.set($event)" name="password" placeholder="Almeno 6 caratteri" />
+      </label>
+      @if (error()) {
+        <p class="form-error" role="alert">{{ error() }}</p>
+      }
+      <button class="submit-button" type="submit" [disabled]="busy()">
+        {{ busy() ? 'Un momento…' : isRegister() ? 'Crea account' : 'Accedi alla raccolta' }}
+      </button>
+    </form>
+
+    <p class="switch-mode">
+      {{ isRegister() ? 'Hai già un account?' : 'È la prima volta qui?' }}
+      <button type="button" (click)="toggleMode()">
+        {{ isRegister() ? 'Accedi' : 'Crea un account' }}
+      </button>
+    </p>
+    <p class="demo-note">Modalità demo: puoi accedere con i dati precompilati.</p>
+  </div>
+</section>

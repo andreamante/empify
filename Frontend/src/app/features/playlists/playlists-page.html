@@ -1,0 +1,109 @@
+<section class="playlists-page">
+  <header class="page-heading">
+    <div>
+      <p class="page-context">ORDINE PERSONALE</p>
+      <h1>Le tue playlist</h1>
+      <p class="page-description">Raccolte fatte a modo tuo, una traccia alla volta.</p>
+    </div>
+    <button class="button button-primary" type="button" (click)="toggleForm()">
+      {{ showForm() ? 'Annulla' : 'Nuova playlist' }}
+    </button>
+  </header>
+
+  @if (error()) {
+    <p class="inline-error" role="alert">{{ error() }}</p>
+  }
+
+  @if (showForm()) {
+    <form class="create-form" (ngSubmit)="createPlaylist()">
+      <label>
+        <span>Nome della playlist</span>
+        <input required maxlength="80" [ngModel]="name()" (ngModelChange)="name.set($event)" name="name" placeholder="Es. Domeniche lente" />
+      </label>
+      <label>
+        <span>Descrizione <small>facoltativa</small></span>
+        <input maxlength="180" [ngModel]="description()" (ngModelChange)="description.set($event)" name="description" placeholder="Che atmosfera vuoi raccogliere?" />
+      </label>
+      <button class="button button-primary" type="submit">Crea playlist</button>
+    </form>
+  }
+
+  @if (playlistService.playlists().length) {
+    <div class="playlist-layout">
+      <nav class="playlist-index" aria-label="Elenco playlist">
+        <p class="index-heading">LE TUE RACCOLTE <span>{{ playlistService.playlists().length.toString().padStart(2, '0') }}</span></p>
+        @for (playlist of playlistService.playlists(); track playlist.id; let index = $index) {
+          <div class="playlist-entry" [class.is-selected]="selectedId() === playlist.id">
+            <button type="button" class="playlist-choice" [attr.aria-pressed]="selectedId() === playlist.id" (click)="selectedId.set(playlist.id)">
+              <span class="playlist-code">{{ (index + 1).toString().padStart(2, '0') }}</span>
+              <span class="playlist-name">{{ playlist.name }}</span>
+              <span class="playlist-count">{{ playlist.tracks?.length ?? 0 }}</span>
+            </button>
+            <button class="delete-playlist" type="button" [attr.aria-label]="'Elimina playlist ' + playlist.name" (click)="deletePlaylist(playlist)">×</button>
+          </div>
+        }
+      </nav>
+
+      @if (selectedPlaylist(); as playlist) {
+        <section class="playlist-detail">
+          <header class="detail-heading">
+            <div>
+              <span class="detail-code">RACCOLTA {{ playlistService.playlists().indexOf(playlist) + 1 }}</span>
+              <h2>{{ playlist.name }}</h2>
+              <p>{{ playlist.description || 'Una raccolta personale.' }}</p>
+            </div>
+            @if (playlist.tracks?.length) {
+              <button class="button button-secondary" type="button" (click)="playFirst(playlist)">
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 9 6-9 6z" /></svg>
+                Riproduci
+              </button>
+            }
+          </header>
+
+          <form class="add-track-form" (ngSubmit)="addSelectedTrack()">
+            <label>
+              <span class="visually-hidden">Brano da aggiungere</span>
+              <select [ngModel]="addTrackId()" (ngModelChange)="addTrackId.set($event)" name="track">
+                <option value="">Aggiungi un brano dalla raccolta</option>
+                @for (track of trackService.tracks(); track track.id) {
+                  <option [value]="track.id">{{ track.title }} — {{ track.artist }}</option>
+                }
+              </select>
+            </label>
+            <button class="button button-secondary" type="submit" [disabled]="!addTrackId()">Aggiungi</button>
+          </form>
+
+          @if (playlist.tracks?.length) {
+            <div class="playlist-track-list">
+              @for (track of playlist.tracks; track track.id; let index = $index) {
+                <div class="playlist-track">
+                  <span class="playlist-code">{{ (index + 1).toString().padStart(2, '0') }}</span>
+                  <img [src]="track.coverUrl || '/mock-covers/small-hours.svg'" alt="" />
+                  <button class="playlist-track-title" type="button" (click)="play(playlist, track)">
+                    <strong>{{ track.title }}</strong>
+                    <span>{{ track.artist }} · {{ track.album }}</span>
+                  </button>
+                  <span class="duration-cell">{{ formatDuration(track.durationSeconds) }}</span>
+                  <button class="delete-playlist" type="button" [attr.aria-label]="'Rimuovi ' + track.title + ' dalla playlist'" (click)="removeTrack(playlist, track)">×</button>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="playlist-empty">
+              <span class="empty-index">00</span>
+              <h3>Ancora nessun brano</h3>
+              <p>Scegli un brano dalla tua raccolta per dare forma a questa playlist.</p>
+            </div>
+          }
+        </section>
+      }
+    </div>
+  } @else {
+    <div class="playlist-empty">
+      <span class="empty-index">00</span>
+      <h2>La prima playlist comincia da qui</h2>
+      <p>Raccogli i brani che vuoi ritrovare insieme.</p>
+      <button class="button button-primary" type="button" (click)="showForm.set(true)">Crea playlist</button>
+    </div>
+  }
+</section>

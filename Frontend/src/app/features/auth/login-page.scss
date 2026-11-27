@@ -1,0 +1,225 @@
+.auth-page {
+  display: grid;
+  min-height: min(690px, calc(100vh - 130px));
+  grid-template-columns: 0.9fr 1.1fr;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+}
+
+.auth-art {
+  position: relative;
+  display: flex;
+  min-height: 550px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--cobalt);
+}
+
+.auth-art::before,
+.auth-art::after {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 50%;
+  content: '';
+}
+
+.auth-art::after {
+  width: 340px;
+  height: 340px;
+}
+
+.record-groove {
+  width: 245px;
+  height: 245px;
+  border: 1px solid rgb(255 255 255 / 28%);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, var(--tdk-red) 0 17%, transparent 17.4%),
+    radial-gradient(circle at center, transparent 0 37%, rgb(255 255 255 / 30%) 37.2% 37.7%, transparent 38% 50%, rgb(255 255 255 / 28%) 50.2% 50.7%, transparent 51% 63%, rgb(255 255 255 / 22%) 63.2% 63.7%, transparent 64%);
+}
+
+.record-label {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  width: 82px;
+  height: 82px;
+  place-content: center;
+  border-radius: 50%;
+  background: var(--tdk-red);
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 850;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.art-caption {
+  position: absolute;
+  right: 28px;
+  bottom: 25px;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+  line-height: 1.6;
+}
+
+.auth-panel {
+  display: flex;
+  width: min(440px, 100%);
+  flex-direction: column;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 56px 50px;
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 54px;
+  color: var(--ink);
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  background: var(--cobalt);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 750;
+}
+
+.page-context {
+  margin: 0 0 12px;
+  color: var(--ink-muted);
+  font-size: 0.64rem;
+  font-weight: 750;
+  letter-spacing: 0.09em;
+}
+
+h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(1.9rem, 3vw, 2.45rem);
+  font-weight: 720;
+  letter-spacing: -0.05em;
+  line-height: 1.05;
+}
+
+.auth-description {
+  margin: 12px 0 28px;
+  color: var(--ink-soft);
+  font-size: 0.87rem;
+  line-height: 1.6;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+form label span {
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+form input {
+  min-height: 45px;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.83rem;
+}
+
+form input:focus {
+  outline: 2px solid color-mix(in srgb, var(--cobalt) 28%, transparent);
+  outline-offset: 1px;
+}
+
+.submit-button {
+  min-height: 46px;
+  margin-top: 3px;
+  border: 0;
+  background: var(--cobalt);
+  color: #fff;
+  font: inherit;
+  font-size: 0.83rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: var(--cobalt-deep);
+}
+
+.submit-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.form-error {
+  margin: 0;
+  padding: 9px 11px;
+  border: 1px solid #d5a39b;
+  background: #fbefed;
+  color: #74251b;
+  font-size: 0.78rem;
+}
+
+.switch-mode {
+  margin: 20px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.77rem;
+}
+
+.switch-mode button {
+  padding: 0 0 0 4px;
+  border: 0;
+  background: transparent;
+  color: var(--cobalt);
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.demo-note {
+  margin: 22px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-muted);
+  font-size: 0.69rem;
+}
+
+@media (max-width: 760px) {
+  .auth-page { grid-template-columns: 1fr; }
+  .auth-art { min-height: 190px; }
+  .record-groove { width: 142px; height: 142px; }
+  .record-label { width: 54px; height: 54px; font-size: 0.54rem; }
+  .auth-art::before { width: 250px; height: 250px; }
+  .auth-art::after { width: 200px; height: 200px; }
+  .art-caption { right: 17px; bottom: 14px; font-size: 0.52rem; }
+  .auth-panel { padding: 34px 24px; }
+  .wordmark { margin-bottom: 34px; }
+}
