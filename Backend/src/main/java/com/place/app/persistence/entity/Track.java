@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.OffsetDateTime;
 
@@ -33,7 +34,7 @@ public class Track {
     public String album;
 
     @Column(name = "duration_seconds", nullable = false)
-    public Integer durationSeconds;
+    public Integer durationSeconds = 0;
 
     @Column(name = "mime_type", nullable = false, length = 100)
     public String mimeType;
@@ -48,8 +49,9 @@ public class Track {
     public boolean isFavorite;
 
     @Column(name = "play_count", nullable = false)
-    public Integer playCount;
+    public Integer playCount = 0;
 
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     public OffsetDateTime createdAt;
 }

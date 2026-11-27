@@ -8,6 +8,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.OffsetDateTime;
 
@@ -30,6 +31,7 @@ public class PlaylistTrack {
     @Column(nullable = false)
     public Integer position;
 
+    @CreationTimestamp
     @Column(name = "added_at", nullable = false)
     public OffsetDateTime addedAt;
 }

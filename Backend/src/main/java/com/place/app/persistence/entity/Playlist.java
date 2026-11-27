@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.OffsetDateTime;
 
@@ -29,6 +30,7 @@ public class Playlist {
     @Column(columnDefinition = "TEXT")
     public String description;
 
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     public OffsetDateTime createdAt;
 }

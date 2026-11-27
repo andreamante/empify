@@ -1,5 +1,7 @@
 package com.place.app.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.OffsetDateTime;
 
 public record TrackResponse(
@@ -11,6 +13,7 @@ public record TrackResponse(
         String mimeType,
         Long fileSize,
         boolean hasCover,
+        @JsonProperty("isFavorite")
         boolean isFavorite,
         Integer playCount,
         OffsetDateTime createdAt

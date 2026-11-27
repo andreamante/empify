@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.OffsetDateTime;
 
@@ -25,6 +26,7 @@ public class User {
     @Column(name = "password_hash", nullable = false, length = 255)
     public String passwordHash;
 
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     public OffsetDateTime createdAt;
 }

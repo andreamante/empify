@@ -1,4 +1,6 @@
 package com.place.app.dto;
 
-public record FavoriteRequest(boolean isFavorite) {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record FavoriteRequest(@JsonProperty("isFavorite") boolean isFavorite) {
 }
