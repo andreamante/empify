@@ -1,14 +1,19 @@
 <section class="upload-page">
   <header class="page-heading">
     <div>
-      <p class="page-context">LA TUA MUSICA</p>
       <h1>Aggiungi un brano</h1>
       <p class="page-description">Carica un file audio per ascoltarlo nella tua raccolta personale.</p>
     </div>
   </header>
 
   <form class="upload-form" (ngSubmit)="submit()">
-    <label class="file-drop">
+    <label
+      class="file-drop"
+      [class.is-dragging]="dragging()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+    >
       <input type="file" accept="audio/*" (change)="selectFile($event)" />
       <span class="upload-symbol" aria-hidden="true">
         <svg viewBox="0 0 32 32"><path d="M16 21V5m0 0-6 6m6-6 6 6M6 20v7h20v-7" /></svg>
@@ -53,6 +58,9 @@
     <footer class="form-actions">
       <a routerLink="/library">Torna alla raccolta</a>
       <button class="button button-primary" type="submit" [disabled]="busy()">
+        @if (busy()) {
+          <span class="loading-spinner" aria-hidden="true"></span>
+        }
         {{ busy() ? 'Caricamento…' : 'Aggiungi alla raccolta' }}
       </button>
     </footer>

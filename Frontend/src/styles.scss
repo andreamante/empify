@@ -1,51 +1,34 @@
 @use './app/app.scss';
 
 :root {
-  color-scheme: light;
-  --cobalt: #1e3a8a;
-  --cobalt-deep: #172f6f;
-  --tdk-red: #d32f2f;
-  --tdk-red-ink: #8e2323;
-  --ground: #fcfbf7;
-  --surface: #fff;
-  --paper-blue: #eef1f7;
-  --ink: #1e3a8a;
-  --ink-soft: #344866;
-  --ink-muted: #59697f;
-  --line: #d9dce2;
-  --line-strong: #a6a6a6;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color-scheme: dark;
+  --ground: #050506;
+  --ground-raised: #0c0c0e;
+  --surface: rgba(28, 28, 30, 0.65);
+  --surface-strong: rgba(28, 28, 30, 0.88);
+  --surface-hover: rgba(48, 48, 52, 0.72);
+  --ink: #ffffff;
+  --ink-soft: #d1d1d6;
+  --ink-muted: #a1a1a6;
+  --ink-faint: #73737a;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.15);
+  --accent: #fa243c;
+  --accent-hover: #ff4058;
+  --accent-wash: rgba(250, 36, 60, 0.13);
+  --success: #55d68b;
+  --danger-wash: rgba(250, 36, 60, 0.1);
+  --shadow-glass: 0 24px 70px rgba(0, 0, 0, 0.46);
+  --radius-card: 22px;
+  --radius-control: 12px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, system-ui, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: var(--ground);
   color: var(--ink);
-}
-
-@font-face {
-  font-family: "Amatic SC";
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("/fonts/amatic-sc-700-latin-ext.woff2") format("woff2");
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-
-@font-face {
-  font-family: "Amatic SC";
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("/fonts/amatic-sc-700-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-h1 {
-  font-family: "Amatic SC", sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.025em;
-  text-transform: uppercase;
 }
 
 * {
@@ -55,14 +38,19 @@ h1 {
 html {
   min-width: 320px;
   min-height: 100%;
-  scrollbar-color: #8393a8 var(--ground);
+  scrollbar-color: #48484d var(--ground);
+  scrollbar-width: thin;
 }
 
 body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
-  background: var(--ground);
+  background:
+    radial-gradient(ellipse at 86% 5%, rgba(111, 21, 43, 0.14), transparent 34rem),
+    radial-gradient(ellipse at 18% 82%, rgba(48, 39, 78, 0.1), transparent 34rem),
+    var(--ground);
+  color: var(--ink);
 }
 
 button,
@@ -82,17 +70,156 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 select:focus-visible {
-  outline: 3px solid var(--tdk-red);
+  outline: 2px solid rgba(250, 36, 60, 0.85);
   outline-offset: 3px;
 }
 
-::selection {
-  background: var(--tdk-red);
+input::placeholder {
+  color: var(--ink-faint);
+  opacity: 1;
+}
+
+input {
+  caret-color: var(--accent);
+}
+
+.button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 17px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 220ms var(--ease-out),
+    color 220ms var(--ease-out),
+    border-color 220ms var(--ease-out),
+    box-shadow 220ms var(--ease-out),
+    transform 180ms var(--ease-out);
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.button-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.button-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: 0 8px 26px rgba(250, 36, 60, 0.2);
+}
+
+.button-secondary {
+  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--ink-soft);
+}
+
+.button-secondary:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--ink);
 }
 
+.button svg {
+  width: 15px;
+  fill: currentColor;
+}
+
+.inline-error {
+  padding: 11px 13px;
+  border: 1px solid rgba(250, 36, 60, 0.25);
+  border-radius: var(--radius-control);
+  background: var(--danger-wash);
+  color: #ffb8bf;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  animation: rise-in 240ms var(--ease-out) both;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.playing-mark {
+  display: inline-flex;
+  height: 15px;
+  align-items: center;
+  gap: 2px;
+}
+
+.playing-mark i {
+  width: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+  animation: catalog-beat 800ms ease-in-out infinite alternate;
+}
+
+.playing-mark i:nth-child(1) { height: 7px; }
+.playing-mark i:nth-child(2) { height: 13px; animation-delay: 140ms; }
+.playing-mark i:nth-child(3) { height: 9px; animation-delay: 280ms; }
+
+.loading-spinner {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  border: 2px solid rgba(255, 255, 255, 0.38);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spinner-turn 700ms linear infinite;
+}
+
+@keyframes spinner-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes catalog-beat {
+  to {
+    transform: scaleY(0.45);
+  }
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .playing-mark i {
+    animation: none;
   }
 }

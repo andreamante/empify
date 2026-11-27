@@ -1,25 +1,18 @@
 .upload-page {
-  max-width: 920px;
+  max-width: 980px;
   margin: 0 auto;
-  padding: 48px 56px 160px;
+  padding: 46px 48px 60px;
+  animation: rise-in 420ms var(--ease-out) both;
 }
 
 .page-heading {
-  margin-bottom: 32px;
-}
-
-.page-context {
-  margin: 0 0 12px;
-  color: var(--ink-muted);
-  font-size: 0.67rem;
-  font-weight: 750;
-  letter-spacing: 0.09em;
+  margin-bottom: 27px;
 }
 
 h1 {
   margin: 0;
   color: var(--ink);
-  font-size: clamp(2rem, 3.4vw, 3rem);
+  font-size: clamp(2.35rem, 4vw, 3.35rem);
   font-weight: 720;
   letter-spacing: -0.045em;
   line-height: 1;
@@ -27,33 +20,55 @@ h1 {
 
 .page-description {
   margin: 12px 0 0;
-  color: var(--ink-soft);
+  color: var(--ink-muted);
   font-size: 0.92rem;
+  line-height: 1.5;
 }
 
 .upload-form {
-  padding: 24px;
-  border: 1px solid var(--line-strong);
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
   background: var(--surface);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
 }
 
 .file-drop {
   display: flex;
-  min-height: 205px;
+  min-height: 218px;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   gap: 9px;
   padding: 24px;
-  border: 1px dashed #8290a4;
-  background: var(--paper-blue);
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  border-radius: 17px;
+  background: rgba(0, 0, 0, 0.22);
   color: var(--ink);
   text-align: center;
   cursor: pointer;
+  transition:
+    border-color 220ms var(--ease-out),
+    background 220ms var(--ease-out),
+    transform 220ms var(--ease-out),
+    box-shadow 220ms var(--ease-out);
+}
+
+.file-drop:hover,
+.file-drop.is-dragging {
+  border-color: rgba(250, 36, 60, 0.72);
+  background: rgba(250, 36, 60, 0.055);
+  box-shadow: inset 0 0 0 1px rgba(250, 36, 60, 0.08);
+}
+
+.file-drop.is-dragging {
+  transform: scale(0.995);
 }
 
 .file-drop:focus-within {
-  outline: 2px solid var(--cobalt);
+  outline: 2px solid rgba(250, 36, 60, 0.75);
   outline-offset: 3px;
 }
 
@@ -66,17 +81,19 @@ h1 {
 
 .upload-symbol {
   display: grid;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   place-items: center;
   margin-bottom: 4px;
-  background: var(--cobalt);
-  color: white;
+  border: 1px solid rgba(250, 36, 60, 0.2);
+  border-radius: 15px;
+  background: var(--accent-wash);
+  color: var(--accent);
 }
 
 .upload-symbol svg {
-  width: 24px;
-  height: 24px;
+  width: 25px;
+  height: 25px;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
@@ -85,21 +102,24 @@ h1 {
 }
 
 .file-drop strong {
-  font-size: 0.91rem;
+  font-size: 0.92rem;
+  font-weight: 660;
 }
 
 .file-drop > span:not(.upload-symbol) {
-  color: var(--ink-soft);
+  color: var(--ink-muted);
   font-size: 0.78rem;
 }
 
 .file-drop .file-change {
   margin-top: 2px;
-  color: var(--cobalt);
+  color: var(--ink-soft);
   font-size: 0.71rem;
-  font-weight: 700;
-  text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.file-drop:hover .file-change {
+  color: var(--accent-hover);
 }
 
 .metadata-heading {
@@ -113,7 +133,8 @@ h1 {
 .metadata-heading h2 {
   margin: 0;
   color: var(--ink);
-  font-size: 1.02rem;
+  font-size: 1.05rem;
+  font-weight: 660;
   letter-spacing: -0.02em;
 }
 
@@ -137,7 +158,7 @@ h1 {
 .metadata-grid label > span {
   color: var(--ink-soft);
   font-size: 0.74rem;
-  font-weight: 700;
+  font-weight: 620;
 }
 
 .metadata-grid small {
@@ -147,19 +168,21 @@ h1 {
 
 .metadata-grid input {
   width: 100%;
-  min-height: 43px;
+  min-height: 44px;
   padding: 0 12px;
-  border: 1px solid var(--line-strong);
-  border-radius: 0;
-  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.22);
   color: var(--ink);
   font: inherit;
-  font-size: 0.83rem;
+  font-size: 0.82rem;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
 }
 
 .metadata-grid input:focus {
-  outline: 2px solid color-mix(in srgb, var(--cobalt) 28%, transparent);
-  outline-offset: 1px;
+  border-color: rgba(250, 36, 60, 0.65);
+  outline: 0;
+  box-shadow: 0 0 0 4px rgba(250, 36, 60, 0.09);
 }
 
 .album-field {
@@ -168,20 +191,23 @@ h1 {
 
 .form-message {
   margin: 17px 0 0;
-  padding: 10px 12px;
-  font-size: 0.82rem;
+  padding: 11px 13px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  animation: rise-in 240ms var(--ease-out) both;
 }
 
 .form-error {
-  border: 1px solid #d5a39b;
-  background: #fbefed;
-  color: #74251b;
+  border: 1px solid rgba(250, 36, 60, 0.25);
+  background: var(--danger-wash);
+  color: #ffb8bf;
 }
 
 .form-success {
-  border: 1px solid #9bb9a8;
-  background: #eaf3ed;
-  color: #214f36;
+  border: 1px solid rgba(85, 214, 139, 0.22);
+  background: rgba(85, 214, 139, 0.08);
+  color: #9ce9b9;
 }
 
 .form-actions {
@@ -195,45 +221,55 @@ h1 {
 }
 
 .form-actions a {
-  color: var(--cobalt);
+  color: var(--ink-muted);
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 600;
   text-underline-offset: 3px;
+  transition: color 180ms ease;
 }
 
-.button {
-  min-height: 44px;
-  padding: 0 17px;
-  border: 0;
-  border-radius: 3px;
-  background: var(--cobalt);
-  color: #fff;
-  font: inherit;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
+.form-actions a:hover {
+  color: var(--ink);
 }
 
-.button:hover:not(:disabled) {
-  background: var(--cobalt-deep);
-}
+@media (max-width: 760px) {
+  .upload-page {
+    padding: 38px 28px 48px;
+  }
 
-.button:disabled {
-  cursor: wait;
-  opacity: 0.65;
-}
-
-@media (max-width: 700px) {
-  .upload-page { padding: 34px 24px 165px; }
-  .upload-form { padding: 18px; }
+  .upload-form {
+    padding: 17px;
+  }
 }
 
 @media (max-width: 520px) {
-  .upload-page { padding: 30px 18px 165px; }
-  .metadata-grid { grid-template-columns: 1fr; }
-  .album-field { grid-column: auto; }
-  .metadata-heading { align-items: flex-start; flex-direction: column; }
-  .form-actions { align-items: stretch; flex-direction: column-reverse; }
-  .form-actions .button { width: 100%; }
-  .form-actions a { text-align: center; }
+  .upload-page {
+    padding: 30px 18px 42px;
+  }
+
+  .metadata-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .album-field {
+    grid-column: auto;
+  }
+
+  .metadata-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .form-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .form-actions .button {
+    width: 100%;
+  }
+
+  .form-actions a {
+    text-align: center;
+  }
 }

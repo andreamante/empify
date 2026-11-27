@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -36,9 +37,13 @@ export class LoginPage {
         this.busy.set(false);
         void this.router.navigateByUrl('/library');
       },
-      error: () => {
+      error: (error: unknown) => {
         this.busy.set(false);
-        this.error.set('Accesso non riuscito. Controlla i dati e riprova.');
+        const message =
+          error instanceof HttpErrorResponse && typeof error.error?.message === 'string'
+            ? error.error.message
+            : '';
+        this.error.set(message || 'Accesso non riuscito. Controlla i dati e riprova.');
       },
     });
   }

@@ -18,9 +18,30 @@ export class UploadPage {
   readonly error = signal('');
   readonly success = signal('');
   readonly busy = signal(false);
+  readonly dragging = signal(false);
 
   selectFile(event: Event): void {
     const selected = (event.target as HTMLInputElement).files?.[0] ?? null;
+    this.setFile(selected);
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.dragging.set(true);
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    this.dragging.set(false);
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.dragging.set(false);
+    this.setFile(event.dataTransfer?.files[0] ?? null);
+  }
+
+  private setFile(selected: File | null): void {
     this.error.set('');
     this.success.set('');
     if (!selected) {

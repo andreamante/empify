@@ -9,7 +9,6 @@
       <span class="brand-mark">e</span>
       <span>empify</span>
     </a>
-    <p class="page-context">{{ isRegister() ? 'INIZIA LA TUA RACCOLTA' : 'BENTORNATO' }}</p>
     <h1>{{ isRegister() ? 'Crea il tuo spazio.' : 'La tua musica ti aspetta.' }}</h1>
     <p class="auth-description">
       {{ isRegister() ? 'Un posto personale per i brani che scegli di tenere.' : 'Accedi per tornare alla tua raccolta personale.' }}
@@ -28,12 +27,28 @@
       </label>
       <label>
         <span>Password</span>
-        <input required type="password" minlength="6" [autocomplete]="isRegister() ? 'new-password' : 'current-password'" [ngModel]="password()" (ngModelChange)="password.set($event)" name="password" placeholder="Almeno 6 caratteri" />
+        <input
+          required
+          type="password"
+          [attr.minlength]="isRegister() ? 10 : null"
+          [attr.maxlength]="isRegister() ? 72 : null"
+          [autocomplete]="isRegister() ? 'new-password' : 'current-password'"
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+          name="password"
+          [placeholder]="isRegister() ? 'Almeno 10 caratteri' : 'La tua password'"
+        />
+        @if (isRegister()) {
+          <small class="password-hint">La password deve contenere da 10 a 72 caratteri.</small>
+        }
       </label>
       @if (error()) {
         <p class="form-error" role="alert">{{ error() }}</p>
       }
       <button class="submit-button" type="submit" [disabled]="busy()">
+        @if (busy()) {
+          <span class="loading-spinner" aria-hidden="true"></span>
+        }
         {{ busy() ? 'Un momento…' : isRegister() ? 'Crea account' : 'Accedi alla raccolta' }}
       </button>
     </form>
