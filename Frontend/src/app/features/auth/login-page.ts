@@ -14,8 +14,8 @@ export class LoginPage {
   private readonly router = inject(Router);
   readonly isRegister = signal(false);
   readonly username = signal('');
-  readonly email = signal('lorenzo@example.test');
-  readonly password = signal('ascolta');
+  readonly email = signal('');
+  readonly password = signal('');
   readonly error = signal('');
   readonly busy = signal(false);
 

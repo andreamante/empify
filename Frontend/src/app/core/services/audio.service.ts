@@ -1,9 +1,11 @@
 import { isPlatformBrowser } from '@angular/common';
-import { computed, inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { computed, inject, Injectable, OnDestroy, PLATFORM_ID, signal } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Track } from '../models';
 
 @Injectable({ providedIn: 'root' })
-export class AudioService {
+export class AudioService implements OnDestroy {
   readonly currentTrack = signal<Track | null>(null);
   readonly isPlaying = signal(false);
   readonly currentTime = signal(0);
@@ -13,27 +15,55 @@ export class AudioService {
   readonly progress = computed(() =>
     this.duration() > 0 ? (this.currentTime() / this.duration()) * 100 : 0,
   );
+  private readonly http = inject(HttpClient);
   private readonly platformId = inject(PLATFORM_ID);
   private audio: HTMLAudioElement | null = null;
   private queue: Track[] = [];
+  private loadedTrackId: string | null = null;
+  private streamUrl: string | null = null;
+  private pendingLoad: Subscription | null = null;
 
   play(track?: Track): void {
     if (track) this.currentTrack.set(track);
     const current = this.currentTrack();
     if (!current || !isPlatformBrowser(this.platformId)) return;
-    if (!current.audioUrl) {
-      this.error.set('Questo brano non ha un file audio disponibile.');
+    this.error.set('');
+    const audio = this.getAudio();
+    if (this.loadedTrackId !== current.id) {
+      this.pendingLoad?.unsubscribe();
+      this.releaseStream(audio);
+      this.loadedTrackId = current.id;
+      this.currentTime.set(0);
+      this.duration.set(0);
+      if (!current.audioUrl) {
+        this.error.set('Questo brano non ha un file audio disponibile.');
+        return;
+      }
+
+      this.pendingLoad = this.http
+        .get(current.audioUrl, { responseType: 'blob' })
+        .subscribe({
+          next: (blob) => {
+            if (this.currentTrack()?.id !== current.id) return;
+            this.streamUrl = URL.createObjectURL(blob);
+            audio.src = this.streamUrl;
+            audio.load();
+            this.playLoadedAudio(audio);
+          },
+          error: () => {
+            if (this.currentTrack()?.id !== current.id) return;
+            this.isPlaying.set(false);
+            this.error.set('Impossibile caricare il file audio.');
+          },
+        });
       return;
     }
 
-    this.error.set('');
-    const audio = this.getAudio();
-    if (audio.src !== new URL(current.audioUrl, document.baseURI).href) {
-      this.currentTime.set(0);
-      this.duration.set(0);
-      audio.src = current.audioUrl;
-      audio.load();
-    }
+    if (this.pendingLoad) return;
+    this.playLoadedAudio(audio);
+  }
+
+  private playLoadedAudio(audio: HTMLAudioElement): void {
     void audio.play().catch(() => {
       this.isPlaying.set(false);
       this.error.set('Il file non è riproducibile. Scegli un altro brano o controlla il formato.');
@@ -77,8 +107,14 @@ export class AudioService {
   }
 
   stop(): void {
-    this.audio?.pause();
-    if (this.audio) this.audio.currentTime = 0;
+    this.pendingLoad?.unsubscribe();
+    this.pendingLoad = null;
+    this.loadedTrackId = null;
+    if (this.audio) {
+      this.audio.pause();
+      this.audio.currentTime = 0;
+      this.releaseStream(this.audio);
+    }
     this.currentTrack.set(null);
     this.currentTime.set(0);
     this.duration.set(0);
@@ -111,6 +147,19 @@ export class AudioService {
     });
     this.audio = audio;
     return audio;
+  }
+
+  private releaseStream(audio: HTMLAudioElement): void {
+    audio.pause();
+    audio.removeAttribute('src');
+    audio.load();
+    if (this.streamUrl) URL.revokeObjectURL(this.streamUrl);
+    this.streamUrl = null;
+  }
+
+  ngOnDestroy(): void {
+    this.pendingLoad?.unsubscribe();
+    if (this.audio) this.releaseStream(this.audio);
   }
 
   private handleEnded(audio: HTMLAudioElement): void {

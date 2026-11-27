@@ -100,8 +100,8 @@ export class LibraryPage {
     this.selectedPlaylistId.set((event.target as HTMLSelectElement).value);
   }
 
-  formatDuration(seconds: number): string {
-    if (!Number.isFinite(seconds) || seconds <= 0) return '--:--';
+  formatDuration(seconds: number | null): string {
+    if (seconds === null || !Number.isFinite(seconds) || seconds <= 0) return '--:--';
     return `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
   }
 }

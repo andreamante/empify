@@ -1,20 +1,29 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { Observable, of, tap, throwError } from 'rxjs';
+import { forkJoin, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { API_BASE_URL } from '../api';
 import { MOCK_PLAYLISTS } from '../mock-data';
 import { Playlist, Track } from '../models';
+import { TrackService } from './track.service';
 
 @Injectable({ providedIn: 'root' })
 export class PlaylistService {
-  readonly useMock = true;
-  readonly playlists = signal<Playlist[]>(MOCK_PLAYLISTS.map((playlist) => ({ ...playlist })));
+  readonly useMock = false;
+  readonly playlists = signal<Playlist[]>(this.useMock ? MOCK_PLAYLISTS.map((playlist) => ({ ...playlist })) : []);
   private readonly http = inject(HttpClient);
+  private readonly trackService = inject(TrackService);
   private readonly apiUrl = `${API_BASE_URL}/playlists`;
 
   loadPlaylists(): Observable<Playlist[]> {
     if (this.useMock) return of(this.playlists());
-    return this.http.get<Playlist[]>(this.apiUrl).pipe(tap((items) => this.playlists.set(items)));
+    return this.http.get<Playlist[]>(this.apiUrl).pipe(
+      switchMap((items) =>
+        items.length
+          ? forkJoin(items.map((playlist) => this.withTrackCovers(playlist)))
+          : of([]),
+      ),
+      tap((items) => this.playlists.set(items)),
+    );
   }
 
   loadPlaylist(playlistId: string): Observable<Playlist> {
@@ -25,7 +34,9 @@ export class PlaylistService {
         : throwError(() => new Error(`Playlist not found: ${playlistId}`));
     }
 
-    return this.http.get<Playlist>(`${this.apiUrl}/${playlistId}`);
+    return this.http
+      .get<Playlist>(`${this.apiUrl}/${playlistId}`)
+      .pipe(switchMap((playlist) => this.withTrackCovers(playlist)));
   }
 
   create(name: string, description: string): Observable<Playlist> {
@@ -104,6 +115,13 @@ export class PlaylistService {
           ),
         ),
       ),
+    );
+  }
+
+  private withTrackCovers(playlist: Playlist): Observable<Playlist> {
+    const tracks = playlist.tracks ?? [];
+    return this.trackService.withCoverUrls(tracks).pipe(
+      map((coveredTracks) => ({ ...playlist, tracks: coveredTracks })),
     );
   }
 }

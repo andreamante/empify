@@ -1,22 +1,27 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
-import { map, Observable, of, tap } from 'rxjs';
+import { inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { forkJoin, map, Observable, of, shareReplay, tap, finalize, switchMap } from 'rxjs';
 import { API_BASE_URL } from '../api';
 import { MOCK_TRACKS } from '../mock-data';
 import { Track } from '../models';
 
 @Injectable({ providedIn: 'root' })
-export class TrackService {
-  readonly useMock = true;
-  readonly tracks = signal<Track[]>(MOCK_TRACKS.map((track) => ({ ...track })));
+export class TrackService implements OnDestroy {
+  readonly useMock = false;
+  readonly tracks = signal<Track[]>(this.useMock ? MOCK_TRACKS.map((track) => ({ ...track })) : []);
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${API_BASE_URL}/tracks`;
+  private readonly coverUrls = new Map<string, string>();
+  private readonly coverRequests = new Map<string, Observable<string>>();
 
   loadTracks(): Observable<Track[]> {
     if (this.useMock) return of(this.tracks());
     return this.http
       .get<Track[]>(this.apiUrl)
-      .pipe(tap((tracks) => this.tracks.set(tracks.map((track) => this.withMediaUrls(track)))));
+      .pipe(
+        switchMap((tracks) => this.withCoverUrls(tracks)),
+        tap((tracks) => this.tracks.set(tracks)),
+      );
   }
 
   toggleFavorite(trackId: string): Observable<void> {
@@ -30,6 +35,7 @@ export class TrackService {
     }
 
     return this.http.patch<Track>(`${this.apiUrl}/${trackId}/favorite`, {}).pipe(
+      switchMap((track) => this.withCoverUrl(track)),
       tap((updatedTrack) =>
         this.tracks.update((tracks) =>
           tracks.map((track) => (track.id === trackId ? updatedTrack : track)),
@@ -48,7 +54,7 @@ export class TrackService {
 
     if (!this.useMock) {
       return this.http.post<Track>(this.apiUrl, formData).pipe(
-        map((track) => this.withMediaUrls(track)),
+        switchMap((track) => this.withCoverUrl(track)),
         tap((track) => this.tracks.update((tracks) => [track, ...tracks])),
       );
     }
@@ -82,11 +88,38 @@ export class TrackService {
     );
   }
 
-  private withMediaUrls(track: Track): Track {
-    return {
-      ...track,
-      audioUrl: track.audioUrl ?? `${this.apiUrl}/${track.id}/stream`,
-      coverUrl: track.coverUrl ?? (track.hasCover ? `${this.apiUrl}/${track.id}/cover` : undefined),
-    };
+  withCoverUrls(tracks: Track[]): Observable<Track[]> {
+    return tracks.length
+      ? forkJoin(tracks.map((track) => this.withCoverUrl(track)))
+      : of([]);
+  }
+
+  private withCoverUrl(track: Track): Observable<Track> {
+    const audioUrl = `${this.apiUrl}/${track.id}/stream`;
+    if (!track.hasCover) return of({ ...track, audioUrl, coverUrl: undefined });
+    const cachedUrl = this.coverUrls.get(track.id);
+    if (cachedUrl) return of({ ...track, audioUrl, coverUrl: cachedUrl });
+
+    let coverRequest = this.coverRequests.get(track.id);
+    if (!coverRequest) {
+      coverRequest = this.http
+        .get(`${this.apiUrl}/${track.id}/cover`, { responseType: 'blob' })
+        .pipe(
+          map((blob) => URL.createObjectURL(blob)),
+          tap((url) => this.coverUrls.set(track.id, url)),
+          finalize(() => this.coverRequests.delete(track.id)),
+          shareReplay({ bufferSize: 1, refCount: false }),
+        );
+      this.coverRequests.set(track.id, coverRequest);
+    }
+
+    return coverRequest.pipe(
+      map((coverUrl) => ({ ...track, audioUrl, coverUrl })),
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.coverUrls.forEach((url) => URL.revokeObjectURL(url));
+    this.coverUrls.clear();
   }
 }
